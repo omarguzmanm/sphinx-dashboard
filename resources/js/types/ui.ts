@@ -21,3 +21,11 @@ export type FlashToast = {
     type: 'success' | 'info' | 'warning' | 'error';
     message: string;
 };
+
+export type Shortcut = {
+    route: string;
+    url: string;
+    visits: number;
+    lastVisitedAt: string | null;
+    pinned: boolean;
+};

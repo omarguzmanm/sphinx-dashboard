@@ -4,6 +4,7 @@ import {
     CircleUser,
     Contact,
     FileText,
+    LayoutDashboard,
     Mail,
     MessageCircle,
     NotebookPen,
@@ -14,7 +15,9 @@ import {
     SquareKanban,
     Target,
 } from '@lucide/vue';
-import { dashboard } from '@/routes';
+import type { LucideIcon } from '@lucide/vue';
+import { toUrl } from '@/lib/utils';
+import { dashboard, overview } from '@/routes';
 import { edit as editProfile } from '@/routes/profile';
 import { edit as editSecurity } from '@/routes/security';
 import type { NavGroup, NavItem } from '@/types';
@@ -27,6 +30,7 @@ export const navGroups: NavGroup[] = [
     {
         title: 'Dashboard',
         items: [
+            { title: 'Overview', href: overview(), icon: LayoutDashboard },
             { title: 'Analytics', href: dashboard(), icon: ChartColumnBig },
             { title: 'eCommerce', href: '#', icon: ShoppingBag },
             { title: 'CRM Dashboard', href: '#', icon: Target },
@@ -97,3 +101,42 @@ export const navGroups: NavGroup[] = [
 export const topLevelNavItems: NavItem[] = navGroups
     .flatMap((group) => group.items)
     .filter((item) => item.href !== '#');
+
+export type NavEntry = {
+    title: string;
+    icon?: LucideIcon;
+    group: string;
+    parent?: string;
+};
+
+/**
+ * Resolve a URL back to its navigation entry, so anything that only knows
+ * where a link points (the overview shortcuts) can still render the same
+ * icon and label as the sidebar. Children inherit their parent's icon.
+ */
+export function findNavEntry(url: string): NavEntry | undefined {
+    for (const group of navGroups) {
+        for (const item of group.items) {
+            if (toUrl(item.href) === url) {
+                return {
+                    title: item.title,
+                    icon: item.icon,
+                    group: group.title,
+                };
+            }
+
+            for (const child of item.items ?? []) {
+                if (toUrl(child.href) === url) {
+                    return {
+                        title: child.title,
+                        icon: item.icon,
+                        group: group.title,
+                        parent: item.title,
+                    };
+                }
+            }
+        }
+    }
+
+    return undefined;
+}

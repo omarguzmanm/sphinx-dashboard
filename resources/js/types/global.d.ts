@@ -1,6 +1,22 @@
 import type { Auth } from '@/types/auth';
 import type { CustomizerSettings } from '@/types/ui';
 
+// The View Transitions API is not in this TypeScript version's lib.dom yet...
+declare global {
+    type ViewTransition = {
+        finished: Promise<void>;
+        ready: Promise<void>;
+        updateCallbackDone: Promise<void>;
+        skipTransition: () => void;
+    };
+
+    interface Document {
+        startViewTransition?: (
+            callback: () => void | Promise<void>,
+        ) => ViewTransition;
+    }
+}
+
 // Extend ImportMeta interface for Vite...
 declare module 'vite/client' {
     interface ImportMetaEnv {
