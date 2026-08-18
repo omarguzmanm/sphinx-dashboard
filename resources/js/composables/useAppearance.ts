@@ -1,5 +1,5 @@
 import type { ComputedRef, Ref } from 'vue';
-import { computed, onMounted, ref } from 'vue';
+import { computed, nextTick, onMounted, ref } from 'vue';
 import type { Appearance, ResolvedAppearance } from '@/types';
 
 export type { Appearance, ResolvedAppearance };
@@ -64,6 +64,21 @@ const prefersDark = (): boolean => {
     return window.matchMedia('(prefers-color-scheme: dark)').matches;
 };
 
+/**
+ * The polygon wipe in app.css is driven by the View Transitions API. Fall back
+ * to an instant swap where it is unsupported, or where motion is unwelcome.
+ */
+const canAnimateAppearance = (): boolean => {
+    if (typeof document === 'undefined') {
+        return false;
+    }
+
+    return (
+        typeof document.startViewTransition === 'function' &&
+        !window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    );
+};
+
 const handleSystemThemeChange = () => {
     const currentAppearance = getStoredAppearance();
 
@@ -104,7 +119,7 @@ export function useAppearance(): UseAppearanceReturn {
         return appearance.value;
     });
 
-    function updateAppearance(value: Appearance) {
+    async function applyAppearance(value: Appearance) {
         appearance.value = value;
 
         // Store in localStorage for client-side persistence...
@@ -114,6 +129,21 @@ export function useAppearance(): UseAppearanceReturn {
         setCookie('appearance', value);
 
         updateTheme(value);
+
+        // Let Vue flush the dependent UI (the sun/moon swap, the customizer's
+        // active option) so it is captured by the same snapshot instead of
+        // popping in once the transition has finished...
+        await nextTick();
+    }
+
+    function updateAppearance(value: Appearance) {
+        if (!canAnimateAppearance()) {
+            void applyAppearance(value);
+
+            return;
+        }
+
+        document.startViewTransition!(() => applyAppearance(value));
     }
 
     return {
