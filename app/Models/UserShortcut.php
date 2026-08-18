@@ -11,6 +11,22 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 
+/**
+ * A user shortcut is a destination the user has visited, with a count of
+ * visits and a timestamp of the last visit. It is used to suggest shortcuts
+ * on the overview page.
+ *
+ * @property int $id
+ * @property int $user_id
+ * @property string $route
+ * @property int $visits
+ * @property Carbon|null $last_visited_at
+ * @property Carbon|null $pinned_at
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
+ *
+ * @method static Builder<UserShortcut> query()
+ */
 class UserShortcut extends Model
 {
     /** @use HasFactory<UserShortcutFactory> */
@@ -20,14 +36,14 @@ class UserShortcut extends Model
      * How quickly an unused destination loses ground, per day. At 0.05 a
      * shortcut keeps roughly half its weight after two weeks untouched.
      */
-    public const DECAY_PER_DAY = 0.05;
+    public const float DECAY_PER_DAY = 0.05;
 
     /**
      * Routes that say nothing about what a user actually works on.
      *
      * @var list<string>
      */
-    public const IGNORED_ROUTES = [
+    public const array IGNORED_ROUTES = [
         'overview',
         'home',
         'login',

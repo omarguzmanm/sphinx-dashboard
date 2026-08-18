@@ -14,17 +14,16 @@ class OverviewController extends Controller
     /**
      * How many inferred shortcuts to surface.
      */
-    private const SUGGESTION_LIMIT = 6;
+    private const int SUGGESTION_LIMIT = 6;
 
     /**
      * Shown while a user has no history worth ranking.
      *
      * @var list<string>
      */
-    private const FALLBACK_ROUTES = [
+    private const array FALLBACK_ROUTES = [
         'dashboard',
         'profile.edit',
-        'security.edit',
     ];
 
     public function __invoke(Request $request): Response
