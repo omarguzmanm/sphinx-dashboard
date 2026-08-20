@@ -21,7 +21,7 @@ class OverviewController extends Controller
      *
      * @var list<string>
      */
-    private const array FALLBACK_ROUTES = [
+    public const array FALLBACK_ROUTES = [
         'dashboard',
         'profile.edit',
     ];
