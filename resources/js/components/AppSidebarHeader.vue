@@ -1,19 +1,14 @@
 <script setup lang="ts">
 import { usePage } from '@inertiajs/vue3';
 import { Bell, Mail, Moon, Search, ShoppingCart, Sun } from '@lucide/vue';
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 import Breadcrumbs from '@/components/Breadcrumbs.vue';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
 import { SidebarTrigger } from '@/components/ui/sidebar';
-import UserMenuContent from '@/components/UserMenuContent.vue';
+import UserPanel from '@/components/UserPanel.vue';
 import { useAppearance } from '@/composables/useAppearance';
 import { useInitials } from '@/composables/useInitials';
 import type { BreadcrumbItem } from '@/types';
@@ -31,6 +26,8 @@ const page = usePage();
 const user = computed(() => page.props.auth.user);
 
 const { getInitials } = useInitials();
+
+const panelOpen = ref(false);
 const { resolvedAppearance, updateAppearance } = useAppearance();
 
 const toggleAppearance = () => {
@@ -151,29 +148,26 @@ const toggleAppearance = () => {
                 <Mail class="size-5" />
             </Button>
 
-            <DropdownMenu>
-                <DropdownMenuTrigger as-child>
-                    <button
-                        type="button"
-                        class="ml-1 rounded-full focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
-                        data-test="header-user-menu"
-                    >
-                        <Avatar class="size-9">
-                            <AvatarImage
-                                v-if="user.avatar"
-                                :src="user.avatar"
-                                :alt="user.name"
-                            />
-                            <AvatarFallback class="text-xs">
-                                {{ getInitials(user.name) }}
-                            </AvatarFallback>
-                        </Avatar>
-                    </button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent class="w-56 rounded-lg" align="end">
-                    <UserMenuContent :user="user" />
-                </DropdownMenuContent>
-            </DropdownMenu>
+            <button
+                type="button"
+                class="ml-1 rounded-full focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+                aria-label="Open account panel"
+                data-test="header-user-menu"
+                @click="panelOpen = true"
+            >
+                <Avatar class="size-9">
+                    <AvatarImage
+                        v-if="user.avatar"
+                        :src="user.avatar"
+                        :alt="user.name"
+                    />
+                    <AvatarFallback class="text-xs">
+                        {{ getInitials(user.name) }}
+                    </AvatarFallback>
+                </Avatar>
+            </button>
+
+            <UserPanel v-model:open="panelOpen" :user="user" />
         </div>
     </header>
 </template>

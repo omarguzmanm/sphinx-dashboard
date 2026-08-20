@@ -1,7 +1,13 @@
 <script setup lang="ts">
 import { Head } from '@inertiajs/vue3';
 import AppearanceTabs from '@/components/AppearanceTabs.vue';
-import Heading from '@/components/Heading.vue';
+import {
+    Card,
+    CardContent,
+    CardDescription,
+    CardHeader,
+    CardTitle,
+} from '@/components/ui/card';
 import { edit } from '@/routes/appearance';
 
 defineOptions({
@@ -21,12 +27,16 @@ defineOptions({
 
     <h1 class="sr-only">Appearance settings</h1>
 
-    <div class="space-y-6">
-        <Heading
-            variant="small"
-            title="Appearance settings"
-            description="Update the appearance settings for your account"
-        />
-        <AppearanceTabs />
-    </div>
+    <Card class="max-w-xl">
+        <CardHeader>
+            <CardTitle class="text-lg">Appearance</CardTitle>
+            <CardDescription>
+                Update the appearance settings for your account
+            </CardDescription>
+        </CardHeader>
+
+        <CardContent>
+            <AppearanceTabs />
+        </CardContent>
+    </Card>
 </template>
