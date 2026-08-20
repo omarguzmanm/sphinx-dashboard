@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\OverviewController;
 use App\Models\User;
 use App\Models\UserShortcut;
 use Inertia\Testing\AssertableInertia as Assert;
@@ -76,7 +77,7 @@ test('fallback destinations are offered until there is activity to rank', functi
         ->get(route('overview'))
         ->assertInertia(fn (Assert $page) => $page
             ->where('suggested', [])
-            ->has('fallback', 3)
+            ->has('fallback', count(OverviewController::FALLBACK_ROUTES))
             ->where('fallback.0.route', 'dashboard')
         );
 });
